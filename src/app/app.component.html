@@ -1,0 +1,17 @@
+<h1>{{ title }}</h1>
+<nav>
+    <!--  The routerLink is the selector for the RouterLink directive that turns user clicks into router navigations. -->
+    <ul>
+        <li>
+            <a routerLink="/heroes">Heroes</a>
+        </li>
+        <li>
+            <a routerLink="/dashboard">Dashboard</a>
+        </li>
+    </ul>
+</nav>
+
+<!-- The <router-outlet> tells the router where to display routed views. -->
+<router-outlet></router-outlet>
+
+<app-messages></app-messages>

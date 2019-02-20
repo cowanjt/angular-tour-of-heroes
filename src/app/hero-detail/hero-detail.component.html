@@ -1,0 +1,18 @@
+<!-- Angular's *ngIf directive conditionally displays HTML -->
+<div *ngIf="hero">
+  <h2>{{hero.name | uppercase}} Details</h2>
+  <div>
+    <label>id: {{hero.id}}</label>
+  </div>
+  <div>
+    <label>name:
+      <!-- [(ngModel)] is Angular's two-way data binding syntax. -->
+      <input [(ngModel)]="hero.name" placeholder="name">
+    </label>
+    <!-- <br>
+    <label>
+      <span>{{ myInputProp }}</span>
+    </label> -->
+  </div>
+  <button (click)="goBack()">go back</button>
+</div>
