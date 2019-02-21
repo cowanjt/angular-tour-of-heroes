@@ -27,6 +27,10 @@ export class HeroService {
   // Base URL to Heroes Web API
   private heroesUrl = 'api/heroes';
 
+  private httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
+
   hero: Observable<Hero>
 
   constructor(
@@ -63,10 +67,65 @@ export class HeroService {
   getHeroes(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesUrl).
       pipe(
+        // The tap() function looks at the observable values, does something with those values, 
+        // and passes them along the pipe line.
+        tap(_ => this.log('Fetched heroes')),
+
         // The 'catchError()' function handles a call that failed,
         // and returns and empty result.
         catchError(this.handleError('getHeroes', []))
       );
+  }
+
+  // GETS heroes from the in memory Web API created by the HttpClientInMemoryWebApiModule.
+  // Gets the heroes using Angular's HttpClient.
+  getHero(id: number): Observable<Hero> {
+    const url = `${this.heroesUrl}/${id}`;
+    return this.http.get<Hero>(url)
+      .pipe
+      (
+        tap(_ => this.log(`HeroService: fetched hero id=${id}`)),
+        catchError(this.handleError<Hero>(`HeroService: fetched hero id=${id}`))
+      )
+  }
+
+  /** POST: add a new hero to the server */
+  addHero(hero: Hero): Observable<Hero> {
+    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap((newHero: Hero) => this.log(`added hero w/ id=${newHero.id}`)),
+      catchError(this.handleError<Hero>('addHero'))
+    );
+  }
+
+  /** PUT: Update an existing hero on the server */
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap(_ => this.log(`updated hero id=${hero.id}`)),
+      catchError(this.handleError<any>('updateHero'))
+    );
+  }
+
+  /** DELETE: Delete an existing hero on the server */
+  deleteHero(hero: Hero): Observable<any> {
+    const id = typeof hero === 'number' ? hero : hero.id;
+    const url = `${this.heroesUrl}/${id}`;
+
+    return this.http.delete<Hero>(url, this.httpOptions).pipe(
+      tap(_ => this.log(`deleted hero id=${id}`)),
+      catchError(this.handleError<Hero>('deleteHero'))
+    );
+  }
+
+  /* GET heroes whose name contains search term */
+  searchHeroes(term: string): Observable<Hero[]> {
+    if (!term.trim()) {
+      // if not search term, return empty hero array.
+      return of([]);
+    }
+    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
+      tap(_ => this.log(`found heroes matching "${term}"`)),
+      catchError(this.handleError<Hero[]>('searchHeroes', []))
+    );
   }
 
   private log(message: string) {
@@ -79,17 +138,17 @@ export class HeroService {
  * @param operation - name of the operation that failed
  * @param result - optional value to return as the observable result
  */
-private handleError<T> (operation = 'operation', result?: T) {
-  return (error: any): Observable<T> => {
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
 
-    // TODO: send the error to remote logging infrastructure
-    console.error(error); // log to console instead
+      // TODO: send the error to remote logging infrastructure
+      console.error(error); // log to console instead
 
-    // TODO: better job of transforming error for user consumption
-    this.log(`${operation} failed: ${error.message}`);
+      // TODO: better job of transforming error for user consumption
+      this.log(`${operation} failed: ${error.message}`);
 
-    // Let the app keep running by returning an empty result.
-    return of(result as T);
-  };
-}
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
+  }
 }

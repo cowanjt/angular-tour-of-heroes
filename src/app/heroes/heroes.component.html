@@ -1,4 +1,14 @@
 <h2>My Heros</h2>
+<div>
+  <label>Hero name:
+    <!-- Not the '#' syntax. It allows the element to be referenced elsewhere (Like the click event bound to the button element below). -->
+    <input #heroName />
+  </label>
+  <!-- (click) passes input value to add() and then clears the input -->
+  <button (click)="add(heroName.value); heroName.value=''">
+    add
+  </button>
+</div>
 <ul class="heroes">
   <!-- *ngFor: Angular's repeater directive. It repeats the host element for each element in a list. -->
   <!-- [class.selected]: Angular's class binding conditionally adds and removes a CSS class. -->
@@ -9,9 +19,10 @@
 
   <li *ngFor="let hero of heroes">
     <a routerLink="/detail/{{hero.id}}">
-    <!-- <a routerLink="/detail/{{hero.name}}"> -->
+      <!-- <a routerLink="/detail/{{hero.name}}"> -->
       <span class="badge">{{hero.id}}</span> {{hero.name}}
     </a>
+    <button class="delete" title="delete hero" (click)="delete(hero)">x</button>
   </li>
 </ul>
 
